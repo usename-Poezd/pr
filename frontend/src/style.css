@@ -1,0 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap');
+@tailwind base;@tailwind components;@tailwind utilities;
+@layer base{body{font-family:Manrope,sans-serif}::selection{background:#b9e6cf}}
+@layer components{.button{@apply inline-flex items-center justify-center gap-3 rounded-full px-5 py-3 text-sm font-bold transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-coral focus:ring-offset-2}.button-dark{@apply bg-ink text-white hover:bg-coral}.button-light{@apply border border-ink/15 bg-white text-ink hover:border-ink/40}.field{@apply w-full rounded-2xl border border-ink/15 bg-white/80 px-4 py-3.5 outline-none transition placeholder:text-ink/35 focus:border-coral focus:ring-2 focus:ring-coral/20}.label{@apply text-sm font-bold}}

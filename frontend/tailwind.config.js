@@ -1,0 +1,1 @@
+export default { content: ['./index.html','./src/**/*.{vue,js}'], theme: { extend: { fontFamily: { display: ['"DM Serif Display"','serif'], sans: ['Manrope','sans-serif'] }, colors: { ink:'#1d2924', cream:'#f6f4ef', coral:'#f17c5b', mint:'#b9e6cf' } } }, plugins: [] }
