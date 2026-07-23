@@ -1,10 +1,11 @@
 package domain
 
 type Poll struct {
-	ID         string     `json:"id"`
-	Title      string     `json:"title"`
-	Questions  []Question `json:"questions"`
-	AdminToken string     `json:"-"`
+	ID             string     `json:"id"`
+	Title          string     `json:"title"`
+	ResultsVisible bool       `json:"results_visible"`
+	Questions      []Question `json:"questions"`
+	AdminToken     string     `json:"-"`
 }
 type Question struct {
 	ID       string   `json:"id"`

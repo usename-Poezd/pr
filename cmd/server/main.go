@@ -39,7 +39,7 @@ func main() {
 		slog.Error("database unavailable", "error", err)
 		return
 	}
-	for _, migration := range []string{"001_init.sql", "002_question_multiple.sql"} {
+	for _, migration := range []string{"001_init.sql", "002_question_multiple.sql", "003_poll_visibility.sql", "004_results_visible.sql"} {
 		b, err := os.ReadFile(filepath.Join("migrations", migration))
 		if err != nil {
 			panic(err)

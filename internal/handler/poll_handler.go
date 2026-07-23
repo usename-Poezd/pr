@@ -20,8 +20,9 @@ type createQuestion struct {
 	Options  []string `json:"options"`
 }
 type createRequest struct {
-	Title     string           `json:"title"`
-	Questions []createQuestion `json:"questions"`
+	Title          string           `json:"title"`
+	ResultsVisible *bool            `json:"results_visible"`
+	Questions      []createQuestion `json:"questions"`
 }
 type voteRequest struct {
 	Answers []domain.VoteAnswer `json:"answers"`
@@ -70,7 +71,11 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 			qs[i].Options = append(qs[i].Options, domain.Option{Text: text})
 		}
 	}
-	p, e := h.s.Create(r.Context(), in.Title, qs)
+	visible := true
+	if in.ResultsVisible != nil {
+		visible = *in.ResultsVisible
+	}
+	p, e := h.s.Create(r.Context(), in.Title, visible, qs)
 	if e != nil {
 		fail(w, e)
 		return

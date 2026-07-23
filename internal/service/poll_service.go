@@ -16,7 +16,7 @@ var ErrForbidden = errors.New("invalid admin token")
 type PollService struct{ repo repository.PollRepository }
 
 func NewPollService(r repository.PollRepository) *PollService { return &PollService{repo: r} }
-func (s *PollService) Create(ctx context.Context, title string, qs []domain.Question) (domain.Poll, error) {
+func (s *PollService) Create(ctx context.Context, title string, resultsVisible bool, qs []domain.Question) (domain.Poll, error) {
 	title = strings.TrimSpace(title)
 	if title == "" || len(title) > 500 || len(qs) == 0 || len(qs) > 50 {
 		return domain.Poll{}, ErrInvalid
@@ -41,7 +41,7 @@ func (s *PollService) Create(ctx context.Context, title string, qs []domain.Ques
 		return domain.Poll{}, err
 	}
 	token := fmt.Sprintf("%x", b)
-	p, err := s.repo.Create(ctx, title, token, qs)
+	p, err := s.repo.Create(ctx, title, token, resultsVisible, qs)
 	p.AdminToken = token
 	return p, err
 }
@@ -96,6 +96,14 @@ func (s *PollService) Results(ctx context.Context, id, token string) (domain.Res
 			return domain.Results{}, err
 		}
 		if token != expected {
+			return domain.Results{}, ErrForbidden
+		}
+	} else {
+		visible, err := s.repo.ResultsAccess(ctx, id)
+		if err != nil {
+			return domain.Results{}, err
+		}
+		if !visible {
 			return domain.Results{}, ErrForbidden
 		}
 	}

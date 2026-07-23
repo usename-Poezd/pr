@@ -39,7 +39,6 @@ onMounted(load)
           </div>
         </div>
       </div>
-      <RouterLink :to="`/poll/${route.params.id}`" class="button button-light mt-10">Проголосовать ещё раз</RouterLink>
     </div>
   </section>
 </template>
