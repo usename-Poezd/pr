@@ -39,12 +39,14 @@ func main() {
 		slog.Error("database unavailable", "error", err)
 		return
 	}
-	b, err := os.ReadFile(filepath.Join("migrations", "001_init.sql"))
-	if err != nil {
-		panic(err)
-	}
-	if _, err = db.Exec(ctx, string(b)); err != nil {
-		panic(err)
+	for _, migration := range []string{"001_init.sql", "002_question_multiple.sql"} {
+		b, err := os.ReadFile(filepath.Join("migrations", migration))
+		if err != nil {
+			panic(err)
+		}
+		if _, err = db.Exec(ctx, string(b)); err != nil {
+			panic(err)
+		}
 	}
 	r := chi.NewRouter()
 	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(200) })

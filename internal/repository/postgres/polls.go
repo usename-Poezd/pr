@@ -26,10 +26,11 @@ func (r *Repository) Create(ctx context.Context, title, token string, qs []domai
 	p.Title = title
 	for i := range qs {
 		var q domain.Question
-		if err = tx.QueryRow(ctx, `INSERT INTO questions(poll_id,text,position) VALUES($1,$2,$3) RETURNING id::text`, p.ID, qs[i].Text, i).Scan(&q.ID); err != nil {
+		if err = tx.QueryRow(ctx, `INSERT INTO questions(poll_id,text,multiple,position) VALUES($1,$2,$3,$4) RETURNING id::text`, p.ID, qs[i].Text, qs[i].Multiple, i).Scan(&q.ID); err != nil {
 			return p, err
 		}
 		q.Text = qs[i].Text
+		q.Multiple = qs[i].Multiple
 		for j := range qs[i].Options {
 			var o domain.Option
 			if err = tx.QueryRow(ctx, `INSERT INTO options(question_id,text,position) VALUES($1,$2,$3) RETURNING id::text`, q.ID, qs[i].Options[j].Text, j).Scan(&o.ID); err != nil {
@@ -47,7 +48,7 @@ func (r *Repository) Create(ctx context.Context, title, token string, qs []domai
 }
 
 func (r *Repository) Get(ctx context.Context, id string) (domain.Poll, error) {
-	rows, err := r.db.Query(ctx, `SELECT p.id::text,p.title,q.id::text,q.text,o.id::text,o.text FROM polls p JOIN questions q ON q.poll_id=p.id JOIN options o ON o.question_id=q.id WHERE p.id=$1 ORDER BY q.position,o.position`, id)
+	rows, err := r.db.Query(ctx, `SELECT p.id::text,p.title,q.id::text,q.text,q.multiple,o.id::text,o.text FROM polls p JOIN questions q ON q.poll_id=p.id JOIN options o ON o.question_id=q.id WHERE p.id=$1 ORDER BY q.position,o.position`, id)
 	if err != nil {
 		return domain.Poll{}, err
 	}
@@ -57,7 +58,7 @@ func (r *Repository) Get(ctx context.Context, id string) (domain.Poll, error) {
 	for rows.Next() {
 		var q domain.Question
 		var o domain.Option
-		if err = rows.Scan(&p.ID, &p.Title, &q.ID, &q.Text, &o.ID, &o.Text); err != nil {
+		if err = rows.Scan(&p.ID, &p.Title, &q.ID, &q.Text, &q.Multiple, &o.ID, &o.Text); err != nil {
 			return p, err
 		}
 		if p.ID == "" {

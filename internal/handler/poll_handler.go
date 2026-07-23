@@ -15,8 +15,9 @@ type Handler struct{ s *service.PollService }
 func New(s *service.PollService) *Handler { return &Handler{s: s} }
 
 type createQuestion struct {
-	Text    string   `json:"text"`
-	Options []string `json:"options"`
+	Text     string   `json:"text"`
+	Multiple bool     `json:"multiple"`
+	Options  []string `json:"options"`
 }
 type createRequest struct {
 	Title     string           `json:"title"`
@@ -64,6 +65,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	qs := make([]domain.Question, len(in.Questions))
 	for i, q := range in.Questions {
 		qs[i].Text = q.Text
+		qs[i].Multiple = q.Multiple
 		for _, text := range q.Options {
 			qs[i].Options = append(qs[i].Options, domain.Option{Text: text})
 		}

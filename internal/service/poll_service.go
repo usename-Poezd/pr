@@ -56,9 +56,27 @@ func (s *PollService) Vote(ctx context.Context, id string, a []domain.VoteAnswer
 		return ErrInvalid
 	}
 	seen := map[string]bool{}
-	for _, v := range a {
-		if v.QuestionID == "" || v.OptionID == "" || seen[v.QuestionID] {
+	options := map[string]bool{}
+	for i := range a {
+		v := &a[i]
+		if v.QuestionID == "" || seen[v.QuestionID] {
 			return ErrInvalid
+		}
+		if len(v.OptionIDs) > 0 && v.OptionID != "" {
+			return ErrInvalid
+		}
+		if len(v.OptionIDs) == 0 && v.OptionID != "" {
+			v.OptionIDs = []string{v.OptionID}
+			v.OptionID = ""
+		}
+		if len(v.OptionIDs) == 0 {
+			return ErrInvalid
+		}
+		for _, optionID := range v.OptionIDs {
+			if optionID == "" || options[optionID] {
+				return ErrInvalid
+			}
+			options[optionID] = true
 		}
 		seen[v.QuestionID] = true
 	}

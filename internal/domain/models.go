@@ -7,17 +7,19 @@ type Poll struct {
 	AdminToken string     `json:"-"`
 }
 type Question struct {
-	ID      string   `json:"id"`
-	Text    string   `json:"text"`
-	Options []Option `json:"options"`
+	ID       string   `json:"id"`
+	Text     string   `json:"text"`
+	Multiple bool     `json:"multiple"`
+	Options  []Option `json:"options"`
 }
 type Option struct {
 	ID   string `json:"id"`
 	Text string `json:"text"`
 }
 type VoteAnswer struct {
-	QuestionID string `json:"question_id"`
-	OptionID   string `json:"option_id"`
+	QuestionID string   `json:"question_id"`
+	OptionID   string   `json:"option_id,omitempty"`
+	OptionIDs  []string `json:"option_ids,omitempty"`
 }
 type Results struct {
 	ID        string            `json:"id"`
@@ -25,9 +27,10 @@ type Results struct {
 	Questions []QuestionResults `json:"questions"`
 }
 type QuestionResults struct {
-	ID      string          `json:"id"`
-	Text    string          `json:"text"`
-	Options []OptionResults `json:"options"`
+	ID       string          `json:"id"`
+	Text     string          `json:"text"`
+	Multiple bool            `json:"multiple"`
+	Options  []OptionResults `json:"options"`
 }
 type OptionResults struct {
 	ID         string  `json:"id"`

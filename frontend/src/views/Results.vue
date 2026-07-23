@@ -4,16 +4,28 @@ import { useRoute } from 'vue-router'
 import { api } from '../api'
 import StateMessage from '../components/StateMessage.vue'
 import { getCreatedPolls } from '../utils/storage'
-const route=useRoute(),results=ref(null),loading=ref(true),error=ref('')
+const route=useRoute(),results=ref(null),loading=ref(true),error=ref(''),copied=ref(false)
 const token=getCreatedPolls().find(p=>p.id===route.params.id)?.adminToken
+const createdPoll=getCreatedPolls().find(p=>p.id===route.params.id)
+const publicLink=createdPoll?.publicLink||`/polls/${route.params.id}`
+const publicUrl=window.location.origin+publicLink
 function total(question){return question.options.reduce((n,o)=>n+(o.votes||0),0)}
 async function load(){loading.value=true;error.value='';try{results.value=await api.getResults(route.params.id,token)}catch(e){error.value=e.message}finally{loading.value=false}}
+async function share(){if(navigator.share){await navigator.share({title:results.value.title,url:publicUrl});return}await navigator.clipboard.writeText(publicUrl);copied.value=true;setTimeout(()=>copied.value=false,1800)}
 onMounted(load)
 </script>
 <template>
   <section class="mx-auto max-w-2xl px-5 pb-16 pt-10 sm:px-8 sm:pt-20">
     <RouterLink to="/" class="text-sm font-bold text-ink/50 hover:text-coral">← На главную</RouterLink>
     <StateMessage :loading="loading" :error="error" @retry="load"/>
+    <div v-if="route.query.created" class="mt-10 rounded-3xl bg-mint p-5 sm:p-6" role="status">
+        <p class="text-lg font-extrabold">Ваш опрос успешно создан</p>
+        <p class="mt-1 text-sm text-ink/70">Поделитесь ссылкой — результаты обновляются здесь.</p>
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <a :href="publicUrl" class="min-w-0 flex-1 truncate rounded-xl bg-white px-3 py-2 text-sm font-semibold text-ink underline decoration-ink/20 underline-offset-4">{{publicUrl}}</a>
+          <button type="button" class="button button-dark shrink-0" @click="share">{{copied?'Скопировано':'Поделиться / копировать'}}</button>
+        </div>
+    </div>
     <div v-if="results&&!loading" class="mt-10">
       <p class="text-sm font-bold uppercase tracking-[.2em] text-coral">Результаты</p>
       <h1 class="mt-5 font-display text-5xl leading-tight sm:text-6xl">{{results.title}}</h1>
